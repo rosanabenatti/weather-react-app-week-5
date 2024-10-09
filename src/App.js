@@ -17,12 +17,11 @@ function App() {
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [unit, setUnit] = useState("metric"); // Default to Celsius
-  const [searchedCity, setSearchedCity] = useState(false); // Track if the user has searched for a city
+  const [unit, setUnit] = useState("metric");
+  const [searchedCity, setSearchedCity] = useState(false);
 
   const apiKey = "f560c295de51dc458df8b1c23e4beea3";
 
-  // Get weather based on coordinates (latitude and longitude)
   const fetchWeatherByCoords = useCallback((latitude, longitude, newUnit) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${newUnit}&appid=${apiKey}`;
 
@@ -37,8 +36,6 @@ function App() {
         setLoading(false);
       });
   }, []);
-
-  // Get weather based on city name
   const fetchWeatherByCity = (city, newUnit) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
 
@@ -46,7 +43,7 @@ function App() {
       .get(url)
       .then((response) => {
         setData(response.data);
-        setSearchedCity(true); // Track that the user has searched for a city
+        setSearchedCity(true);
       })
       .catch((error) => {
         console.error("Error fetching weather data:", error);
@@ -54,7 +51,6 @@ function App() {
       });
   };
 
-  // Use Geolocation API to get user's current location on page load
   useEffect(() => {
     if (!searchedCity && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -66,40 +62,36 @@ function App() {
           console.error("Error fetching geolocation:", error);
           setLoading(false);
         },
-        { enableHighAccuracy: true } // Enable high accuracy mode
+        { enableHighAccuracy: true }
       );
     } else {
       setLoading(false);
     }
-  }, [searchedCity]); // Only fetch by geolocation if the user hasn't searched for a city
+  }, [searchedCity]);
 
-  // Fetch weather by user's coordinates when latitude and longitude are set
   useEffect(() => {
     if (!searchedCity && lat && lon) {
-      fetchWeatherByCoords(lat, lon, unit); // Call the weather fetch function using geolocation
+      fetchWeatherByCoords(lat, lon, unit);
     }
   }, [lat, lon, unit, fetchWeatherByCoords, searchedCity]);
 
-  // Function to search weather by city name
   const searchLocation = (event) => {
     if (event.key === "Enter") {
-      fetchWeatherByCity(location, unit); // Fetch weather by the searched city name
-      setLocation(""); // Clear the input after the search
+      fetchWeatherByCity(location, unit);
+      setLocation("");
     }
   };
 
-  // Toggle between Celsius and Fahrenheit
   const toggleUnit = (newUnit) => {
-    setUnit(newUnit); // Update the unit state
-    // Refetch the weather data with the new unit without changing the city
+    setUnit(newUnit);
+
     if (searchedCity) {
-      fetchWeatherByCity(data.name, newUnit); // Refetch using the typed city name with the new unit
+      fetchWeatherByCity(data.name, newUnit);
     } else if (lat && lon) {
-      fetchWeatherByCoords(lat, lon, newUnit); // Refetch using coordinates with the new unit
+      fetchWeatherByCoords(lat, lon, newUnit);
     }
   };
 
-  // Function to map weather description to Font Awesome icons
   function getWeatherIcon(description) {
     switch (description) {
       case "Clouds":
@@ -127,7 +119,6 @@ function App() {
     }
   }
 
-  // Determine the unit symbol based on the state
   const unitSymbol = unit === "metric" ? "°C" : "°F";
 
   return (
