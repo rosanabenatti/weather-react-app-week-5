@@ -1,0 +1,177 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: "Outfit", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  background-color: #000;
+  color: #fff;
+}
+
+html {
+  font-size: 16px;
+}
+
+p {
+  font-size: 1.2rem;
+}
+
+h1 {
+  font-size: 4rem;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  position: relative;
+}
+
+.app:before {
+  content: "";
+  background: url("./assets/pexels-zetong-li-880728-9993592.jpg") no-repeat
+    center center/cover;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.app .search {
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.app input {
+  width: 60%;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.app input::placeholder {
+  color: white;
+}
+
+.app input:focus {
+  outline: none;
+  border: 1px solid rgba(255, 255, 255, 1);
+}
+
+.container {
+  max-width: 100%;
+  width: 90%;
+  margin: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.app .top {
+  width: 100%;
+  margin: 1rem auto;
+}
+
+.app .location {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.app .temp h1 {
+  font-size: 5rem;
+}
+
+.app .description {
+  margin-top: 0.5rem;
+}
+
+.app .bottom {
+  display: flex;
+  justify-content: space-evenly;
+  text-align: center;
+  width: 100%;
+  margin: 1rem auto;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.2);
+  flex-wrap: wrap;
+}
+
+.app .bottom div {
+  margin: 0.5rem;
+  flex-basis: 30%;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  p {
+    font-size: 1.6rem;
+  }
+
+  h1 {
+    font-size: 5rem;
+  }
+
+  .container {
+    width: 80%;
+  }
+
+  .app input {
+    width: 40%;
+    font-size: 1.2rem;
+  }
+
+  .app .bottom {
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+}
+
+@media (min-width: 1024px) {
+  h1 {
+    font-size: 6rem;
+  }
+
+  .container {
+    max-width: 700px;
+  }
+
+  .app input {
+    width: 30%;
+  }
+
+  .app .location {
+    font-size: 2.5rem;
+  }
+
+  .app .bottom div {
+    flex-basis: 20%;
+  }
+}
