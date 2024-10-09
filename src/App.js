@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -17,41 +17,28 @@ function App() {
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [unit, setUnit] = useState("metric");
 
   const apiKey = "f560c295de51dc458df8b1c23e4beea3";
 
-  // Get weather based on coordinates (latitude and longitude)
-  const fetchWeatherByCoords = (latitude, longitude) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
+  const fetchWeatherByCoords = useCallback(
+    (latitude, longitude) => {
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${unit}&appid=${apiKey}`;
 
-    axios
-      .get(url)
-      .then((response) => {
-        setData(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching weather data:", error);
-        setLoading(false);
-      });
-  };
+      axios
+        .get(url)
+        .then((response) => {
+          setData(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching weather data:", error);
+          setLoading(false);
+        });
+    },
+    [unit, apiKey]
+  );
 
-  // Get weather based on city name
-  const fetchWeatherByCity = (city) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
-
-    axios
-      .get(url)
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching weather data:", error);
-        alert("Location not found. Please try again.");
-      });
-  };
-
-  // Use Geolocation API to get user's current location on page load
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -70,22 +57,34 @@ function App() {
     }
   }, []);
 
-  // Fetch weather by user's coordinates when latitude and longitude are set
   useEffect(() => {
     if (lat && lon) {
       fetchWeatherByCoords(lat, lon);
     }
-  }, [lat, lon]);
+  }, [lat, lon, fetchWeatherByCoords]);
 
-  // Function to search weather by city name
   const searchLocation = (event) => {
     if (event.key === "Enter") {
-      fetchWeatherByCity(location);
-      setLocation(""); // Clear the input after the search
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=${unit}&appid=${apiKey}`;
+
+      axios
+        .get(url)
+        .then((response) => {
+          setData(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching weather data:", error);
+          alert("Location not found. Please try again.");
+        });
+
+      setLocation("");
     }
   };
 
-  // Function to map weather description to Font Awesome icons
+  const toggleUnit = (newUnit) => {
+    setUnit(newUnit);
+  };
+
   function getWeatherIcon(description) {
     switch (description) {
       case "Clouds":
@@ -113,7 +112,8 @@ function App() {
     }
   }
 
-  // JSX content must be returned inside the component function
+  const unitSymbol = unit === "metric" ? "°C" : "°F";
+
   return (
     <div className="app">
       <div className="container">
@@ -135,7 +135,26 @@ function App() {
                 <p>{data.name}</p>
               </div>
               <div className="temp">
-                {data.main ? <h1>{data.main.temp.toFixed()}°C</h1> : null}
+                {data.main ? (
+                  <h1>
+                    {data.main.temp.toFixed()}
+                    <span className="unit">
+                      <button
+                        className={unit === "metric" ? "active" : ""}
+                        onClick={() => toggleUnit("metric")}
+                      >
+                        °C
+                      </button>
+                      |
+                      <button
+                        className={unit === "imperial" ? "active" : ""}
+                        onClick={() => toggleUnit("imperial")}
+                      >
+                        °F
+                      </button>
+                    </span>
+                  </h1>
+                ) : null}
               </div>
               <div className="description">
                 {data.weather ? (
@@ -153,7 +172,10 @@ function App() {
           <div className="bottom">
             <div className="feels">
               {data.main ? (
-                <p className="bold">{data.main.feels_like.toFixed()}°C</p>
+                <p className="bold">
+                  {data.main.feels_like.toFixed()}
+                  {unitSymbol}
+                </p>
               ) : null}
               <p>Feels Like</p>
             </div>
@@ -163,7 +185,7 @@ function App() {
             </div>
             <div className="wind">
               {data.wind ? (
-                <p className="bold">{data.wind.speed.toFixed()}km/h</p>
+                <p className="bold">{data.wind.speed.toFixed()} km/h</p>
               ) : null}
               <p>Wind</p>
             </div>
