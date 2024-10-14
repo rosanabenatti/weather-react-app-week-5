@@ -29,6 +29,7 @@ function App() {
       .get(url)
       .then((response) => {
         setData(response.data);
+
         setLoading(false);
       })
       .catch((error) => {
@@ -36,6 +37,7 @@ function App() {
         setLoading(false);
       });
   }, []);
+
   const fetchWeatherByCity = (city, newUnit) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
 
@@ -121,6 +123,15 @@ function App() {
 
   const unitSymbol = unit === "metric" ? "°C" : "°F";
 
+  const convertWindSpeed = (speed, unit) => {
+    if (unit === "metric") {
+      return Math.round(speed * 3.6);
+    } else if (unit === "imperial") {
+      return Math.round(speed * 2.237);
+    }
+    return speed;
+  };
+
   return (
     <div className="app">
       <div className="container">
@@ -178,12 +189,14 @@ function App() {
         {data.name && (
           <div className="bottom">
             <div className="feels">
-              {data.main ? (
+              {data.main && data.main.feels_like ? (
                 <p className="bold">
                   {data.main.feels_like.toFixed()}
                   {unitSymbol}
                 </p>
-              ) : null}
+              ) : (
+                <p>N/A</p>
+              )}
               <p>Feels Like</p>
             </div>
             <div className="humidity">
@@ -192,7 +205,10 @@ function App() {
             </div>
             <div className="wind">
               {data.wind ? (
-                <p className="bold">{data.wind.speed.toFixed()} km/h</p>
+                <p className="bold">
+                  {convertWindSpeed(data.wind.speed, unit)}{" "}
+                  {unit === "metric" ? "km/h" : "mph"}
+                </p>
               ) : null}
               <p>Wind</p>
             </div>
