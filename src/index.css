@@ -178,9 +178,8 @@ body {
   }
 }
 
-/* Footer Styles */
 .footer {
-  position: fixed; /* Keeps the footer at the bottom */
+  position: fixed;
   bottom: 0;
   width: 100%;
   text-align: center;
