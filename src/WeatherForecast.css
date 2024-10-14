@@ -6,13 +6,13 @@
 
 .forecast-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr); /* 7 equally spaced columns */
-  gap: 20px; /* Space between columns */
+  grid-template-columns: repeat(7, 1fr);
+  gap: 20px;
   justify-items: center;
   align-items: center;
   width: 100%;
-  max-width: 900px; /* Control the width of the grid */
-  margin: 0 auto; /* Center the grid */
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .forecast-item {
@@ -25,35 +25,30 @@
 
 .forecast-day {
   font-weight: bold;
-  font-size: 16px; /* Reduced day font size */
-  margin-bottom: 5px; /* Increased spacing */
+  font-size: 16px;
+  margin-bottom: 5px;
 }
 
 .forecast-icon {
-  font-size: 40px; /* Slightly larger weather icon */
-  margin-bottom: 10px; /* Space between icon and temperatures */
+  font-size: 40px;
+  margin-bottom: 10px;
 }
 
-/* Style for max temperature */
 .forecast-max-temp {
-  font-size: 18px; /* Back to previous size */
+  font-size: 18px;
   font-weight: bold;
-  margin-bottom: 4px; /* Spacing between max and min temps */
+  margin-bottom: 4px;
 }
 
-/* Style for min temperature */
 .forecast-min-temp {
-  font-size: 16px; /* Matching min temperature size */
+  font-size: 16px;
   font-weight: 300;
   color: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 768px) {
   .forecast-grid {
-    grid-template-columns: repeat(
-      4,
-      1fr
-    ); /* Stack 4 items per row for mobile */
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
   }
 }

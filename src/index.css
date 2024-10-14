@@ -63,7 +63,7 @@ body {
 }
 
 .temp {
-  margin-bottom: 30px; /* Add spacing between temperature and weather details */
+  margin-bottom: 30px;
 }
 
 .temp h1 {
@@ -127,16 +127,16 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 700px; /* Increase max-width for better layout */
+  max-width: 700px;
   margin-top: 32px;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.15); /* Slight transparency */
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 12px;
 }
 
 .weather-details {
   display: flex;
-  justify-content: space-between; /* Spread evenly */
+  justify-content: space-between;
   width: 100%;
   margin-bottom: 30px;
   text-align: center;
@@ -177,4 +177,23 @@ body {
   .bottom {
     max-width: 600px;
   }
+}
+
+.footer {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.footer a {
+  color: #61dafb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer a:hover {
+  text-decoration: underline;
 }
