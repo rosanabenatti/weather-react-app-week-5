@@ -178,24 +178,46 @@ body {
   }
 }
 
+/* Footer Styles */
 .footer {
-  position: absolute;
-  bottom: 20px;
+  position: fixed; /* Keeps the footer at the bottom */
+  bottom: 0;
   width: 100%;
   text-align: center;
   font-size: 14px;
+  padding: 10px 0;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.5
+  ); /* Light background for better readability */
   color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
 }
 
 .footer a {
   color: #61dafb;
   text-decoration: none;
   font-weight: 500;
+  word-break: break-word; /* Break long URLs if necessary */
 }
 
 .footer a:hover {
-  text-decoration: none;
-  color: #fff;
+  text-decoration: underline;
+}
+
+/* For smaller screens */
+@media (max-width: 600px) {
+  .footer {
+    font-size: 12px; /* Reduce font size for mobile */
+    padding: 8px 10px; /* Adjust padding */
+  }
+
+  .footer a {
+    display: block; /* Stack links vertically on small screens */
+    margin: 5px 0; /* Add space between links */
+  }
 }
 
 .spinner {
