@@ -296,7 +296,7 @@ function App() {
           >
             Rosana Benatti
           </a>{" "}
-          and is{" "}
+          and is <br />
           <a
             href="https://github.com/rosanabenatti/weather-react-app-week-5"
             target="_blank"
