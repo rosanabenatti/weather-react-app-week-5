@@ -85,20 +85,22 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Detect the geolocation and fetch weather data accordingly
     if (!searchedCity && navigator.geolocation) {
+      setLoading(true); // Show loading until geolocation fetches the data
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setLat(position.coords.latitude);
           setLon(position.coords.longitude);
+          setLoading(false);
         },
         (error) => {
           console.error("Error fetching geolocation:", error);
+          alert("Could not get your location. Please enter the city manually.");
           setLoading(false);
         },
         { enableHighAccuracy: true }
       );
-    } else {
-      setLoading(false);
     }
   }, [searchedCity]);
 
