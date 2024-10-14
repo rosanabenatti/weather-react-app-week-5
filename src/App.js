@@ -21,56 +21,64 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [unit, setUnit] = useState("metric");
   const [searchedCity, setSearchedCity] = useState(false);
-
   const [dateTime, setDateTime] = useState("");
 
   const apiKey = "bb0df6985c2eab6a171d64a6bacbb4e1";
 
-  const fetchWeatherByCoords = useCallback((latitude, longitude, newUnit) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${newUnit}&appid=${apiKey}`;
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=current,minutely,hourly,alerts&units=${newUnit}&appid=${apiKey}`;
+  // Fetch weather by coordinates
+  const fetchWeatherByCoords = useCallback(
+    (latitude, longitude, newUnit) => {
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${newUnit}&appid=${apiKey}`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=current,minutely,hourly,alerts&units=${newUnit}&appid=${apiKey}`;
 
-    axios
-      .get(url)
-      .then((response) => {
-        setData(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching weather data:", error);
-        setLoading(false);
-      });
+      axios
+        .get(url)
+        .then((response) => {
+          setData(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching weather data:", error);
+          setLoading(false);
+        });
 
-    axios
-      .get(forecastUrl)
-      .then((response) => {
-        setForecast(response.data.daily);
-      })
-      .catch((error) => {
-        console.error("Error fetching forecast data:", error);
-      });
-  }, []);
+      axios
+        .get(forecastUrl)
+        .then((response) => {
+          setForecast(response.data.daily);
+        })
+        .catch((error) => {
+          console.error("Error fetching forecast data:", error);
+        });
+    },
+    [apiKey]
+  );
 
-  const fetchWeatherByCity = (city, newUnit) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
+  // Fetch weather by city name
+  const fetchWeatherByCity = useCallback(
+    (city, newUnit) => {
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
 
-    axios
-      .get(url)
-      .then((response) => {
-        setData(response.data);
-        setSearchedCity(true);
-        fetchWeatherByCoords(
-          response.data.coord.lat,
-          response.data.coord.lon,
-          newUnit
-        );
-      })
-      .catch((error) => {
-        console.error("Error fetching weather data:", error);
-        alert("Location not found. Please try again.");
-      });
-  };
+      axios
+        .get(url)
+        .then((response) => {
+          setData(response.data);
+          setSearchedCity(true);
+          fetchWeatherByCoords(
+            response.data.coord.lat,
+            response.data.coord.lon,
+            newUnit
+          );
+        })
+        .catch((error) => {
+          console.error("Error fetching weather data:", error);
+          alert("Location not found. Please try again.");
+        });
+    },
+    [fetchWeatherByCoords, apiKey]
+  );
 
+  // Update date and time every minute
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
@@ -84,32 +92,41 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Handle geolocation or default to a city
   useEffect(() => {
-    // Detect the geolocation and fetch weather data accordingly
-    if (!searchedCity && navigator.geolocation) {
-      setLoading(true); // Show loading until geolocation fetches the data
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLat(position.coords.latitude);
-          setLon(position.coords.longitude);
-          setLoading(false);
-        },
-        (error) => {
-          console.error("Error fetching geolocation:", error);
-          alert("Could not get your location. Please enter the city manually.");
-          setLoading(false);
-        },
-        { enableHighAccuracy: true }
-      );
-    }
-  }, [searchedCity]);
+    if (!searchedCity) {
+      if (navigator.geolocation) {
+        setLoading(true); // Show loading while fetching geolocation
 
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setLat(position.coords.latitude);
+            setLon(position.coords.longitude);
+          },
+          (error) => {
+            console.error("Error fetching geolocation:", error);
+            alert("Could not get your location. Defaulting to London.");
+            fetchWeatherByCity("London", unit); // Default to London if geolocation fails
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        alert(
+          "Geolocation not supported by your browser. Defaulting to London."
+        );
+        fetchWeatherByCity("London", unit); // Default to London if geolocation not supported
+      }
+    }
+  }, [searchedCity, unit, fetchWeatherByCity]);
+
+  // Fetch weather by coordinates when lat/lon change
   useEffect(() => {
     if (!searchedCity && lat && lon) {
       fetchWeatherByCoords(lat, lon, unit);
     }
   }, [lat, lon, unit, fetchWeatherByCoords, searchedCity]);
 
+  // Handle manual city search input
   const searchLocation = (event) => {
     if (event.key === "Enter") {
       fetchWeatherByCity(location, unit);
@@ -117,6 +134,7 @@ function App() {
     }
   };
 
+  // Toggle between Celsius and Fahrenheit
   const toggleUnit = (newUnit) => {
     setUnit(newUnit);
 
@@ -127,6 +145,7 @@ function App() {
     }
   };
 
+  // Weather icon rendering
   const getWeatherIcon = (description) => {
     switch (description) {
       case "Clouds":
@@ -170,16 +189,23 @@ function App() {
       <div className="container">
         <div className="top">
           <div className="search">
-            <input
-              value={location}
-              onChange={(event) => setLocation(event.target.value)}
-              onKeyPress={searchLocation}
-              placeholder="Enter Location"
-              type="text"
-            />
+            {!searchedCity && !loading && (
+              <input
+                value={location}
+                onChange={(event) => setLocation(event.target.value)}
+                onKeyPress={searchLocation}
+                placeholder="Enter Location"
+                type="text"
+              />
+            )}
           </div>
+
           {loading ? (
-            <p>Loading weather...</p>
+            <div className="loading">
+              <p>Loading forecast...</p>
+              {/* Optional spinner */}
+              <div className="spinner"></div>
+            </div>
           ) : (
             <>
               <div className="location">
