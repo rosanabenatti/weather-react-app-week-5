@@ -36,7 +36,7 @@ body {
 }
 
 .app input {
-  width: 280px;
+  width: 100%;
   padding: 12.8px;
   font-size: 16px;
   border: 2px solid rgba(255, 255, 255, 0.8);
@@ -110,7 +110,6 @@ body {
   margin-bottom: 40px;
 }
 
-/* Date and Time styling */
 .date-time {
   font-size: 18px;
   color: rgba(255, 255, 255, 0.7);
@@ -158,8 +157,8 @@ body {
 
 @media (min-width: 768px) {
   .app input {
-    width: 300px;
-    font-size: 19px;
+    width: 90%x;
+    font-size: 14px;
   }
 
   .location {
@@ -195,5 +194,6 @@ body {
 }
 
 .footer a:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  color: #fff;
 }
