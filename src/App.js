@@ -10,6 +10,7 @@ import {
   faSmog,
   faMoon,
 } from "@fortawesome/free-solid-svg-icons";
+import WeatherForecast from "./WeatherForecast";
 
 function App() {
   const [data, setData] = useState({});
@@ -19,18 +20,24 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [unit, setUnit] = useState("metric");
   const [searchedCity, setSearchedCity] = useState(false);
+  const [forecast, setForecast] = useState([]);
 
   const apiKey = "f560c295de51dc458df8b1c23e4beea3";
 
   const fetchWeatherByCoords = useCallback((latitude, longitude, newUnit) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${newUnit}&appid=${apiKey}`;
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${newUnit}&appid=${apiKey}`;
+    const forecastUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=${newUnit}&appid=${apiKey}`;
 
     axios
-      .get(url)
+      .get(weatherUrl)
       .then((response) => {
         setData(response.data);
-
         setLoading(false);
+
+        return axios.get(forecastUrl);
+      })
+      .then((forecastResponse) => {
+        setForecast(forecastResponse.data.daily);
       })
       .catch((error) => {
         console.error("Error fetching weather data:", error);
@@ -39,13 +46,19 @@ function App() {
   }, []);
 
   const fetchWeatherByCity = (city, newUnit) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
+    const forecastUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=hourly,minutely&units=${newUnit}&appid=${apiKey}`;
 
     axios
-      .get(url)
+      .get(weatherUrl)
       .then((response) => {
         setData(response.data);
         setSearchedCity(true);
+
+        return axios.get(forecastUrl);
+      })
+      .then((forecastResponse) => {
+        setForecast(forecastResponse.data.daily);
       })
       .catch((error) => {
         console.error("Error fetching weather data:", error);
@@ -123,6 +136,7 @@ function App() {
 
   const unitSymbol = unit === "metric" ? "°C" : "°F";
 
+  // Function to convert wind speed
   const convertWindSpeed = (speed, unit) => {
     if (unit === "metric") {
       return Math.round(speed * 3.6);
@@ -191,7 +205,7 @@ function App() {
             <div className="feels">
               {data.main && data.main.feels_like ? (
                 <p className="bold">
-                  {data.main.feels_like.toFixed()}
+                  {data.main.feels_like.toFixed(1)}
                   {unitSymbol}
                 </p>
               ) : (
@@ -212,6 +226,10 @@ function App() {
               ) : null}
               <p>Wind</p>
             </div>
+
+            {forecast.length > 0 && (
+              <WeatherForecast forecast={forecast} unit={unit} />
+            )}
           </div>
         )}
       </div>
