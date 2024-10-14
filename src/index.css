@@ -27,7 +27,7 @@ body {
   width: 100%;
   min-height: 100vh;
   background: none;
-  padding: 32px;
+  padding: 40px;
   text-align: center;
 }
 
@@ -60,6 +60,10 @@ body {
   font-size: 24px;
   font-weight: 500;
   margin-bottom: 8px;
+}
+
+.temp {
+  margin-bottom: 30px; /* Add spacing between temperature and weather details */
 }
 
 .temp h1 {
@@ -103,6 +107,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 40px;
+}
+
+/* Date and Time styling */
+.date-time {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 10px;
 }
 
 .description p {
@@ -111,26 +123,28 @@ body {
 
 .bottom {
   display: flex;
-  flex-direction: column; /* Stack weather details and forecast */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 600px; /* Control the max width */
+  max-width: 700px; /* Increase max-width for better layout */
   margin-top: 32px;
-  padding: 16px;
+  padding: 20px;
   background: rgba(255, 255, 255, 0.15); /* Slight transparency */
   border-radius: 12px;
 }
+
 .weather-details {
-  display: flex; /* Align Feels Like, Humidity, Wind horizontally */
-  justify-content: space-around; /* Spread them out evenly */
-  width: 100%; /* Full width for the row */
-  margin-bottom: 20px; /* Space between weather details and forecast */
+  display: flex;
+  justify-content: space-between; /* Spread evenly */
+  width: 100%;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .weather-details div {
   text-align: center;
-  flex: 1; /* Each section takes up equal space */
+  flex: 1;
 }
 
 .bottom div {

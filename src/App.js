@@ -14,7 +14,7 @@ import {
 
 function App() {
   const [data, setData] = useState({});
-  const [forecastData, setForecastData] = useState([]); // State for 7-day forecast
+  const [forecast, setForecast] = useState(null);
   const [location, setLocation] = useState("");
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
@@ -22,14 +22,14 @@ function App() {
   const [unit, setUnit] = useState("metric");
   const [searchedCity, setSearchedCity] = useState(false);
 
-  const apiKey = "bb0df6985c2eab6a171d64a6bacbb4e1"; // Replace with your valid API key
+  const [dateTime, setDateTime] = useState("");
 
-  // Fetch weather and forecast by coordinates
+  const apiKey = "bb0df6985c2eab6a171d64a6bacbb4e1";
+
   const fetchWeatherByCoords = useCallback((latitude, longitude, newUnit) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${newUnit}&appid=${apiKey}`;
     const forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=current,minutely,hourly,alerts&units=${newUnit}&appid=${apiKey}`;
 
-    // Fetch current weather
     axios
       .get(url)
       .then((response) => {
@@ -41,19 +41,16 @@ function App() {
         setLoading(false);
       });
 
-    // Fetch 7-day forecast
     axios
       .get(forecastUrl)
       .then((response) => {
-        console.log("Forecast API Response: ", response.data);
-        setForecastData(response.data.daily); // Get daily forecast and set state
+        setForecast(response.data.daily);
       })
       .catch((error) => {
         console.error("Error fetching forecast data:", error);
       });
   }, []);
 
-  // Fetch weather by city name
   const fetchWeatherByCity = (city, newUnit) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
 
@@ -61,11 +58,12 @@ function App() {
       .get(url)
       .then((response) => {
         setData(response.data);
-        const { lat, lon } = response.data.coord; // Get lat and lon from the city's weather data
         setSearchedCity(true);
-
-        // Fetch 7-day forecast using the city's coordinates
-        fetchWeatherByCoords(lat, lon, newUnit);
+        fetchWeatherByCoords(
+          response.data.coord.lat,
+          response.data.coord.lon,
+          newUnit
+        );
       })
       .catch((error) => {
         console.error("Error fetching weather data:", error);
@@ -73,7 +71,19 @@ function App() {
       });
   };
 
-  // Geolocation API to get user coordinates
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+      const options = { weekday: "long", hour: "2-digit", minute: "2-digit" };
+      setDateTime(now.toLocaleDateString("en-US", options));
+    };
+
+    updateDateTime();
+    const interval = setInterval(updateDateTime, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (!searchedCity && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -92,14 +102,12 @@ function App() {
     }
   }, [searchedCity]);
 
-  // Trigger fetch based on location changes
   useEffect(() => {
     if (!searchedCity && lat && lon) {
       fetchWeatherByCoords(lat, lon, unit);
     }
   }, [lat, lon, unit, fetchWeatherByCoords, searchedCity]);
 
-  // Search for location
   const searchLocation = (event) => {
     if (event.key === "Enter") {
       fetchWeatherByCity(location, unit);
@@ -107,7 +115,6 @@ function App() {
     }
   };
 
-  // Toggle between metric and imperial units
   const toggleUnit = (newUnit) => {
     setUnit(newUnit);
 
@@ -118,18 +125,7 @@ function App() {
     }
   };
 
-  // Convert wind speed based on the unit
-  const convertWindSpeed = (speed, unit) => {
-    if (unit === "metric") {
-      return Math.round(speed * 3.6); // Convert meters per second to km/h
-    } else if (unit === "imperial") {
-      return Math.round(speed * 2.237); // Convert meters per second to mph
-    }
-    return speed; // Return the original value if no unit conversion is needed
-  };
-
-  // Get weather icon based on description
-  function getWeatherIcon(description) {
+  const getWeatherIcon = (description) => {
     switch (description) {
       case "Clouds":
         return <FontAwesomeIcon icon={faCloud} />;
@@ -154,9 +150,18 @@ function App() {
       default:
         return null;
     }
-  }
+  };
 
   const unitSymbol = unit === "metric" ? "°C" : "°F";
+
+  const convertWindSpeed = (speed, unit) => {
+    if (unit === "metric") {
+      return Math.round(speed * 3.6);
+    } else if (unit === "imperial") {
+      return Math.round(speed * 2.237);
+    }
+    return speed;
+  };
 
   return (
     <div className="app">
@@ -177,6 +182,7 @@ function App() {
             <>
               <div className="location">
                 <p>{data.name}</p>
+                <p className="date-time">{dateTime}</p>
               </div>
               <div className="temp">
                 {data.main ? (
@@ -212,7 +218,7 @@ function App() {
           )}
         </div>
 
-        {data.name && (
+        {data.name && forecast ? (
           <div className="bottom">
             <div className="weather-details">
               <div className="feels">
@@ -245,11 +251,40 @@ function App() {
               </div>
             </div>
 
-            <br />
-            {/* Pass forecastData to WeatherForecast */}
-            <WeatherForecast forecast={forecastData} unit={unit} />
+            <WeatherForecast forecast={forecast} />
           </div>
+        ) : (
+          <p>Loading forecast...</p>
         )}
+      </div>
+
+      <div className="footer">
+        <footer>
+          This project was coded by{" "}
+          <a
+            href="https://github.com/rosanabenatti"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Rosana Benatti
+          </a>{" "}
+          and is{" "}
+          <a
+            href="https://github.com/rosanabenatti/weather-react-app-week-5"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            open-sourced on GitHub
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://react-wheater-app-geo.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            hosted on Netlify.
+          </a>
+        </footer>
       </div>
     </div>
   );
