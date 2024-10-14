@@ -1,41 +1,37 @@
 import React from "react";
+import WeatherIcon from "./WeatherIcon";
 import "./WeatherForecast.css";
 
 export default function WeatherForecast(props) {
-  console.log(props.forecast);
+  const forecastData = props.forecast;
 
-  if (!props.forecast || props.forecast.length === 0) {
-    return <p>Loading forecast...</p>; // Or you can return null or a loading spinner
+  if (!forecastData || forecastData.length === 0) {
+    return <p>Loading forecast...</p>; // Handle the case where forecast data is not available
   }
 
-  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  const getDay = (timestamp) => {
-    const date = new Date(timestamp * 1000); // Convert timestamp to milliseconds
-    return daysOfWeek[date.getDay()]; // Get day of the week (Sun, Mon, etc.)
-  };
+  // Slice the array to skip today's forecast
+  const dailyForecast = forecastData.slice(1, 8); // Next 7 days
 
   return (
     <div className="forecast-container">
       <div className="forecast-grid">
-        {props.forecast.map((day, index) => (
+        {dailyForecast.map((day, index) => (
           <div key={index} className="forecast-item">
-            {/* First line: Day of the Week */}
-            <p className="forecast-day">{getDay(day.dt)}</p>
-            {/* Second line: Weather Icon */}
-            <p className="forecast-icon">
-              <img
-                src={`http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png`}
-                alt={day.weather[0].description}
-              />
+            {/* Day of the Week */}
+            <p className="forecast-day">
+              {new Date(day.dt * 1000).toLocaleDateString("en-US", {
+                weekday: "short",
+              })}
             </p>
-            {/* Third line: Max and Min Temperatures */}
-            <p className="forecast-temps">
-              {Math.round(day.temp.max)}
-              {props.unit === "metric" ? "°C" : "°F"} /{" "}
-              {Math.round(day.temp.min)}
-              {props.unit === "metric" ? "°C" : "°F"}
-            </p>
+
+            {/* Weather Icon */}
+            <WeatherIcon code={day.weather[0].icon} size={36} />
+
+            {/* Max Temperature */}
+            <p className="forecast-max-temp">{Math.round(day.temp.max)}°C</p>
+
+            {/* Min Temperature */}
+            <p className="forecast-min-temp">{Math.round(day.temp.min)}°C</p>
           </div>
         ))}
       </div>

@@ -22,7 +22,7 @@ function App() {
   const [unit, setUnit] = useState("metric");
   const [searchedCity, setSearchedCity] = useState(false);
 
-  const apiKey = "f560c295de51dc458df8b1c23e4beea3";
+  const apiKey = "bb0df6985c2eab6a171d64a6bacbb4e1"; // Replace with your valid API key
 
   // Fetch weather and forecast by coordinates
   const fetchWeatherByCoords = useCallback((latitude, longitude, newUnit) => {
