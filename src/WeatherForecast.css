@@ -1,0 +1,46 @@
+.forecast-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 equally spaced columns */
+  gap: 10px; /* Add space between the columns */
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.forecast-item {
+  text-align: center;
+}
+
+.forecast-day {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.forecast-icon {
+  font-size: 36px; /* Larger icon for better visibility */
+}
+
+.forecast-temps {
+  margin-top: 5px;
+  font-size: 16px;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column; /* Stack weather details and forecast */
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 32px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.15); /* Slight transparency */
+  border-radius: 12px;
+}

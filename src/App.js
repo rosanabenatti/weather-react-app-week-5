@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import WeatherForecast from "./WeatherForecast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSun,
@@ -10,55 +11,61 @@ import {
   faSmog,
   faMoon,
 } from "@fortawesome/free-solid-svg-icons";
-import WeatherForecast from "./WeatherForecast";
 
 function App() {
   const [data, setData] = useState({});
+  const [forecastData, setForecastData] = useState([]); // State for 7-day forecast
   const [location, setLocation] = useState("");
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
   const [loading, setLoading] = useState(true);
   const [unit, setUnit] = useState("metric");
   const [searchedCity, setSearchedCity] = useState(false);
-  const [forecast, setForecast] = useState([]);
 
   const apiKey = "f560c295de51dc458df8b1c23e4beea3";
 
+  // Fetch weather and forecast by coordinates
   const fetchWeatherByCoords = useCallback((latitude, longitude, newUnit) => {
-    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${newUnit}&appid=${apiKey}`;
-    const forecastUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=${newUnit}&appid=${apiKey}`;
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${newUnit}&appid=${apiKey}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=current,minutely,hourly,alerts&units=${newUnit}&appid=${apiKey}`;
 
+    // Fetch current weather
     axios
-      .get(weatherUrl)
+      .get(url)
       .then((response) => {
         setData(response.data);
         setLoading(false);
-
-        return axios.get(forecastUrl);
-      })
-      .then((forecastResponse) => {
-        setForecast(forecastResponse.data.daily);
       })
       .catch((error) => {
         console.error("Error fetching weather data:", error);
         setLoading(false);
       });
+
+    // Fetch 7-day forecast
+    axios
+      .get(forecastUrl)
+      .then((response) => {
+        console.log("Forecast API Response: ", response.data);
+        setForecastData(response.data.daily); // Get daily forecast and set state
+      })
+      .catch((error) => {
+        console.error("Error fetching forecast data:", error);
+      });
   }, []);
 
+  // Fetch weather by city name
   const fetchWeatherByCity = (city, newUnit) => {
-    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
-    const forecastUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=hourly,minutely&units=${newUnit}&appid=${apiKey}`;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnit}&appid=${apiKey}`;
 
     axios
-      .get(weatherUrl)
+      .get(url)
       .then((response) => {
         setData(response.data);
+        const { lat, lon } = response.data.coord; // Get lat and lon from the city's weather data
         setSearchedCity(true);
 
-        return axios.get(forecastUrl);
-      })
-      .then((forecastResponse) => {
-        setForecast(forecastResponse.data.daily);
+        // Fetch 7-day forecast using the city's coordinates
+        fetchWeatherByCoords(lat, lon, newUnit);
       })
       .catch((error) => {
         console.error("Error fetching weather data:", error);
@@ -66,6 +73,7 @@ function App() {
       });
   };
 
+  // Geolocation API to get user coordinates
   useEffect(() => {
     if (!searchedCity && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -84,12 +92,14 @@ function App() {
     }
   }, [searchedCity]);
 
+  // Trigger fetch based on location changes
   useEffect(() => {
     if (!searchedCity && lat && lon) {
       fetchWeatherByCoords(lat, lon, unit);
     }
   }, [lat, lon, unit, fetchWeatherByCoords, searchedCity]);
 
+  // Search for location
   const searchLocation = (event) => {
     if (event.key === "Enter") {
       fetchWeatherByCity(location, unit);
@@ -97,6 +107,7 @@ function App() {
     }
   };
 
+  // Toggle between metric and imperial units
   const toggleUnit = (newUnit) => {
     setUnit(newUnit);
 
@@ -107,6 +118,17 @@ function App() {
     }
   };
 
+  // Convert wind speed based on the unit
+  const convertWindSpeed = (speed, unit) => {
+    if (unit === "metric") {
+      return Math.round(speed * 3.6); // Convert meters per second to km/h
+    } else if (unit === "imperial") {
+      return Math.round(speed * 2.237); // Convert meters per second to mph
+    }
+    return speed; // Return the original value if no unit conversion is needed
+  };
+
+  // Get weather icon based on description
   function getWeatherIcon(description) {
     switch (description) {
       case "Clouds":
@@ -135,16 +157,6 @@ function App() {
   }
 
   const unitSymbol = unit === "metric" ? "°C" : "°F";
-
-  // Function to convert wind speed
-  const convertWindSpeed = (speed, unit) => {
-    if (unit === "metric") {
-      return Math.round(speed * 3.6);
-    } else if (unit === "imperial") {
-      return Math.round(speed * 2.237);
-    }
-    return speed;
-  };
 
   return (
     <div className="app">
@@ -202,34 +214,40 @@ function App() {
 
         {data.name && (
           <div className="bottom">
-            <div className="feels">
-              {data.main && data.main.feels_like ? (
-                <p className="bold">
-                  {data.main.feels_like.toFixed(1)}
-                  {unitSymbol}
-                </p>
-              ) : (
-                <p>N/A</p>
-              )}
-              <p>Feels Like</p>
-            </div>
-            <div className="humidity">
-              {data.main ? <p className="bold">{data.main.humidity}%</p> : null}
-              <p>Humidity</p>
-            </div>
-            <div className="wind">
-              {data.wind ? (
-                <p className="bold">
-                  {convertWindSpeed(data.wind.speed, unit)}{" "}
-                  {unit === "metric" ? "km/h" : "mph"}
-                </p>
-              ) : null}
-              <p>Wind</p>
+            <div className="weather-details">
+              <div className="feels">
+                {data.main && data.main.feels_like ? (
+                  <p className="bold">
+                    {Math.round(data.main.feels_like)}
+                    {unitSymbol}
+                  </p>
+                ) : (
+                  <p>N/A</p>
+                )}
+                <p>Feels Like</p>
+              </div>
+
+              <div className="humidity">
+                {data.main ? (
+                  <p className="bold">{data.main.humidity}%</p>
+                ) : null}
+                <p>Humidity</p>
+              </div>
+
+              <div className="wind">
+                {data.wind ? (
+                  <p className="bold">
+                    {convertWindSpeed(data.wind.speed, unit)}{" "}
+                    {unit === "metric" ? "km/h" : "mph"}
+                  </p>
+                ) : null}
+                <p>Wind</p>
+              </div>
             </div>
 
-            {forecast.length > 0 && (
-              <WeatherForecast forecast={forecast} unit={unit} />
-            )}
+            <br />
+            {/* Pass forecastData to WeatherForecast */}
+            <WeatherForecast forecast={forecastData} unit={unit} />
           </div>
         )}
       </div>

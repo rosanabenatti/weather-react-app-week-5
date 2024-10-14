@@ -26,20 +26,19 @@ body {
   justify-content: center;
   width: 100%;
   min-height: 100vh;
-  /* Removing the semi-transparent background causing the strip */
   background: none;
-  padding: 2rem;
+  padding: 32px;
   text-align: center;
 }
 
 .app .search {
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 }
 
 .app input {
   width: 280px;
-  padding: 0.8rem;
-  font-size: 1rem;
+  padding: 12.8px;
+  font-size: 16px;
   border: 2px solid rgba(255, 255, 255, 0.8);
   border-radius: 25px;
   background: rgba(255, 255, 255, 0.1);
@@ -58,13 +57,13 @@ body {
 }
 
 .location {
-  font-size: 1.5rem;
+  font-size: 24px;
   font-weight: 500;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
 .temp h1 {
-  font-size: 5rem;
+  font-size: 80px;
   font-weight: 700;
   margin: 0;
   display: inline-flex;
@@ -72,8 +71,8 @@ body {
 }
 
 .temp .unit {
-  margin-left: 0.5rem;
-  font-size: 1.5rem;
+  margin-left: 8px;
+  font-size: 24px;
   display: inline-flex;
   align-items: center;
 }
@@ -82,7 +81,7 @@ body {
   background: none;
   border: none;
   color: white;
-  font-size: 1.5rem;
+  font-size: 24px;
   cursor: pointer;
   margin: 0 5px;
   padding: 0;
@@ -99,26 +98,39 @@ body {
 }
 
 .description {
-  font-size: 1.25rem;
-  margin-top: 0.5rem;
+  font-size: 20px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .description p {
-  margin-left: 0.5rem;
+  margin-left: 8px;
 }
 
 .bottom {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column; /* Stack weather details and forecast */
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: 500px;
-  margin-top: 2rem;
-  padding: 1rem;
+  max-width: 600px; /* Control the max width */
+  margin-top: 32px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.15); /* Slight transparency */
   border-radius: 12px;
+}
+.weather-details {
+  display: flex; /* Align Feels Like, Humidity, Wind horizontally */
+  justify-content: space-around; /* Spread them out evenly */
+  width: 100%; /* Full width for the row */
+  margin-bottom: 20px; /* Space between weather details and forecast */
+}
+
+.weather-details div {
+  text-align: center;
+  flex: 1; /* Each section takes up equal space */
 }
 
 .bottom div {
@@ -127,25 +139,25 @@ body {
 
 .bold {
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 19px;
 }
 
 @media (min-width: 768px) {
   .app input {
     width: 300px;
-    font-size: 1.2rem;
+    font-size: 19px;
   }
 
   .location {
-    font-size: 2rem;
+    font-size: 32px;
   }
 
   .temp h1 {
-    font-size: 6rem;
+    font-size: 96px;
   }
 
   .description {
-    font-size: 1.5rem;
+    font-size: 24px;
   }
 
   .bottom {
